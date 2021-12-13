@@ -1,0 +1,316 @@
+## Vue Router 구성
+
+Vue Router 를 사용하기 위해서 모듈을 내려받는다. 4버전을 사용한다.
+
+```
+$ npm install vue-router@4
+```
+
+프로젝트 디렉토리 src 하위에 `routes` 디렉토리를 생성하고 `index.js` 파일을 하나 생성한다.
+
+```js
+import { createRouter, createWebHashHistory } from "vue-router";
+import Home from "./Home";
+
+export default createRouter({
+  history: createWebHashHistory(), // history 모드에는 hash 모드와 history 가 있고 지금은 hash 모드를 사용한다.
+
+  // 각 라우터에 해당하는 경로와 컴포넌트를 정의.
+  routes: [
+    {
+      path: "/",
+      component: Home,
+    },
+  ],
+});
+```
+
+Home 이라는 컴포넌터를 직접 생성하여야 한다. 아래와 같이 생겼을 수 있다.
+
+```vue
+<template>
+  <h1>Home!</h1>
+</template>
+
+<script></script>
+
+<style></style>
+```
+
+이와 같이 Vue Router 의 기본 설정을 마쳤다면 Vue 프로젝트에서 사용하기 위해 플러그인을 연결하여야 한다. `src/main.js` 에 아래와 같이 코드를 추가한다.
+
+```js
+import { createApp } from "vue";
+import App from "./App";
+import router from "./routes/index";
+
+createApp(App).use(router).mount("#app");
+```
+
+페이지를 더 추가한다고 한다면 컴포넌트를 생성하고, `src/routes/index.js` 에서 해당하는 페이지를 추가하자.
+
+```vue
+<template>
+  <h1>Movie!</h1>
+</template>
+
+<script></script>
+<style></style>
+```
+
+```js
+import { createRouter, createWebHashHistory } from "vue-router";
+import Home from "./Home";
+import Movie from "./Movie";
+
+export default createRouter({
+  history: createWebHashHistory(), // history 모드에는 hash 모드와 history 가 있고 지금은 hash 모드를 사용한다.
+
+  // 각 라우터에 해당하는 경로와 컴포넌트를 정의.
+  routes: [
+    {
+      path: "/",
+      component: Home,
+    },
+
+    // 아주 간단히 페이지 추가 가능 :)
+    {
+      path: "/movie",
+      component: Movie,
+    },
+  ],
+});
+```
+
+<br/>
+
+---
+
+## Bootstrap
+
+Bootstrap 을 사용해보자. 5버전을 사용한다.
+
+```
+$ npm install bootstrap@5
+```
+
+`src/scss/main.scss` 파일을 생성하고 bootstrap 을 사용하기 위해 import 한다.
+
+```scss
+@import "/node_modules/bootstrap/scss/bootstrap";
+```
+
+`src/App.vue` 파일에 위 파일을 가져온다.
+
+```vue
+<template>
+  <RouterView />
+</template>
+
+<style lang="scss"></style>
+```
+
+style 태그에는 scoped 옵션을 주지 않도록 주의하자. scoped 옵션을 줄 경우 전체 페이지에 bootstrap 설정이 적용되는 것이 아닌 App.vue 컴포넌트 안에서만 적용이 될 것이다.
+
+bootstrap 은 커스터마이징 기능을 제공한다. 자세한 내용은 [공식 홈페이지](https://getbootstrap.com/docs/5.0/customize/overview/)를 참고하고 간단한 예제만 다루어 본다.
+
+가이드 내용에 따르면 반드시 import 해야 하는 것들이 있다. 이를 가져오자. `src/scss/main.scss` 파일에 아래 내용을 추가하자.
+
+```scss
+// Required
+@import "../node_modules/bootstrap/scss/functions";
+
+// Default variable overrides
+$body-bg: #000;
+$body-color: #111;
+
+// Required
+@import "../node_modules/bootstrap/scss/variables";
+@import "../node_modules/bootstrap/scss/mixins";
+@import "/node_modules/bootstrap/scss/bootstrap";
+```
+
+주석 중 Default... 하는 부분에 달러사인($)이 붙어 있는 키 값에 밸류값(여기선 색깔)을 지정하는 모습이 보인다. bootstrap 에서 default 로 제공하는 색깔값을 변경할 수 있다는 것을 의미한다. 어떤 값들이 기본값인지, 그리고 어떤 값들을 변경할 수 있는지 확인하기 위해서 `node_modules/bootstrap` 에서 확인해보자.
+
+`$primary` 라는 bootstrap 의 기본 색깔이 있는데 파란색으로 설정이 되어 있을 것이다. 아래 내용을 `Home.vue` 에 추가하여 그 색깔을 확인해보자
+
+```vue
+<template>
+  <h1>Home!</h1>
+  <div class="btn btn-primary">Home</div>
+</template>
+```
+
+만약 파란색이 마음에 들지 않는다면 이를 입맛대로 수정할 수 있다. `node_modules/bootstrap/scss/_variables.scss` 파일에 들어가보면 그 내용을 확인할 수 있는데, 아래와 같다. 일부만 가져와본다.
+
+```scss
+// scss-docs-start color-variables
+$blue: #0d6efd !default;
+// ... 나머지 생략
+// scss-docs-end color-variables
+
+// scss-docs-start theme-color-variables
+$primary: $blue !default;
+// ...나머지 생략
+// scss-docs-end theme-color-variables
+```
+
+이제 왜 `$primary` 가 파란색인지 이해가 간다. 파란색이 싫다면 아까 공식 홈페이지에서 복붙할 때 가져온 코드에 Default 를 수정하는 부분에서 이를 수정하면 될 것이다. 그리고 파일을 들여다보면 위와 같이 `!default` 가 있는 것을 볼 수 있으며, 이 것이 붙어있는 값만 커스터마이징이 가능함을 주의하자.
+
+```scss
+// Required
+@import "../node_modules/bootstrap/scss/functions";
+
+// Default variable overrides
+$body-bg: #000;
+$body-color: #111;
+$primary: #fdc000; // <- 추가!
+
+// Required
+@import "../node_modules/bootstrap/scss/variables";
+@import "../node_modules/bootstrap/scss/mixins";
+@import "/node_modules/bootstrap/scss/bootstrap";
+```
+
+이렇게 추가한다면 이제 primary 는 파란색이 아닌 노란색이 되어 있을 것이다. 위 코드를 조금만 정리한다. 커스터마이징한 후에 @import 해야 함을 주의하자 :)
+
+```scss
+$primary: #fdc000;
+
+@import "/node_modules/bootstrap/scss/functions";
+@import "/node_modules/bootstrap/scss/variables";
+@import "/node_modules/bootstrap/scss/mixins";
+@import "/node_modules/bootstrap/scss/bootstrap";
+```
+
+<br/>
+
+---
+
+## Bootstrap - Nav
+
+헤더를 생성해보자. 네비게이션 바의 형태로 만들어질 것이다. Bootstrap 으로 형태를 만들 것이며 [이 것](https://getbootstrap.com/docs/5.0/components/navs-tabs/#pills)을 사용할 것이다.
+
+Header 컴포넌트를 생성해보자. `src/components/Header.vue` 를 만들어준다.
+
+```vue
+<template>
+  <header>
+    <div class="nav nav-pills">
+      <div v-for="nav in navigations" :key="nav.name" class="nav-item">
+        <RouterLink :to="nav.href" class="nav-link">
+          {{ nav.name }}
+        </RouterLink>
+      </div>
+    </div>
+  </header>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      navigations: [
+        {
+          name: "Search",
+          href: "/",
+        },
+        {
+          name: "Movie",
+          href: "/movie",
+        },
+        {
+          name: "About",
+          href: "/about",
+        },
+      ],
+    };
+  },
+};
+</script>
+```
+
+코드 내용이 이해가 된다 :)
+
+없던 Movie 페이지가 생겼으니 `/src/routes/Moive.vue` 파일을 생성하고 `/src/routes/index.js` 에 추가해주자.
+
+```vue
+<template>
+  <h1>Movie!</h1>
+</template>
+```
+
+```js
+import { createRouter, createWebHashHistory } from "vue-router";
+import Home from "./Home";
+import Movie from "./Movie";
+import About from "./About";
+
+export default createRouter({
+  history: createWebHashHistory(),
+  routes: [
+    {
+      path: "/",
+      component: Home,
+    },
+    {
+      path: "/about",
+      component: About,
+    },
+
+    // 추가! :)
+    {
+      path: "/movie",
+      component: Movie,
+    },
+  ],
+});
+```
+
+여기에서 한 가지 문제가 있는데, 사용하기로 한 [이 것(Pills)](https://getbootstrap.com/docs/5.0/components/navs-tabs/#pills) 에는 `active` 클래스가 붙을 경우 색이 채워지도록 되어 있는데 지금 만든 페이지는 그렇지 않다.
+
+Vue Router 는 기본적으로 active 된 링크에 대해서 default 로 class 를 하나 붙혀주는데 이는 `router-link-active` 이다. 공식 홈페이지에 [이 내용](https://next.router.vuejs.org/api/#active-class) 을 참고하자.
+
+이를 active 로 바꿔주는 방법은 쉽다. RouterLink 에 active-class 속성을 active 라고 명시해주면 된다. `src/components/Header.vue` 로 가서 아래와 같이 수정해주자.
+
+```vue
+<template>
+  <header>
+    <div class="nav nav-pills">
+      <div v-for="nav in navigations" :key="nav.name" class="nav-item">
+        <!-- active-class="active" 로 명시 -->
+        <RouterLink :to="nav.href" active-class="active" class="nav-link">
+          {{ nav.name }}
+        </RouterLink>
+      </div>
+    </div>
+  </header>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      navigations: [
+        {
+          name: "Search",
+          href: "/",
+        },
+        {
+          name: "Movie",
+          href: "/movie",
+        },
+        {
+          name: "About",
+          href: "/about",
+        },
+      ],
+    };
+  },
+};
+</script>
+```
+
+<br/>
+
+---
